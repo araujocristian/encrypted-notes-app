@@ -1,55 +1,57 @@
 import { useState } from "react";
-import { useEditor, EditorContent, Content } from "@tiptap/react";
+import { useEditor, EditorContent, JSONContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { v4 as uuid } from 'uuid'
+import { v4 as uuid } from "uuid";
+import { Note } from "./types";
 
 import styles from "./App.module.css";
-
-type Note = {
-  id: string;
-  title: string;
-  content: Content;
-  updatedAt: Date;
-}
+import { NoteEditor } from "./NoteEditor";
 
 function App() {
-  const [notes, setNotes] = useState<Record<string, Note>>({})
+  const [notes, setNotes] = useState<Record<string, Note>>({});
+  const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
 
-  const editor = useEditor({
-    extensions: [StarterKit],
-    content: "<p>Hello World!</p>",
-    editorProps: {
-      attributes: {
-        class: styles.textEditor,
+  const activeNote = activeNoteId ? notes[activeNoteId] : null;
+
+  const handleChangeNoteContent = (
+    noteId: string,
+    content: JSONContent,
+    title = "New note",
+  ) => {
+    setNotes((notes) => ({
+      ...notes,
+      [noteId]: {
+        ...notes[noteId],
+        updatedAt: new Date(),
+        content,
+        title,
       },
-    },
-  });
-
-  const toggleBold = () => {
-    editor?.chain().focus().toggleBold().run();
-  };
-
-  const toggleItalic = () => {
-    editor?.chain().focus().toggleItalic().run();
+    }));
   };
 
   const handleCreateNewNote = () => {
     const newNote = {
       id: uuid(),
-      title: 'New note',
+      title: "New note",
       content: `<h1>New note</h1>`,
-      updatedAt: new Date()
-    }
+      updatedAt: new Date(),
+    };
 
     setNotes((notes) => ({
       ...notes,
-      [newNote.id]: newNote
-    }))
-  }
+      [newNote.id]: newNote,
+    }));
+
+    setActiveNoteId(newNote.id)
+  };
+
+  const handleChangeActiveNote = (id: string) => {
+    setActiveNoteId(id);
+  };
 
   const notesList = Object.values(notes).sort(
-    (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime()
-  )
+    (a, b) => b.updatedAt.getTime() - a.updatedAt.getTime(),
+  );
 
   return (
     <div className={styles.pageContainer}>
@@ -63,38 +65,28 @@ function App() {
               key={note.id}
               role="button"
               tabIndex={0}
-              className={styles.sidebarItem}
+              className={
+                note.id === activeNoteId
+                  ? styles.sidebarItemActive
+                  : styles.sidebarItem
+              }
+              onClick={() => handleChangeActiveNote(note.id)}
             >
               {note.title}
             </div>
           ))}
         </section>
       </aside>
-      <main className={styles.editorContainer}>
-        <div className={styles.toolbar}>
-          <button
-            className={
-              editor?.isActive("bold")
-                ? styles.toolbarButtonActive
-                : styles.toolbarButton
-            }
-            onClick={toggleBold}
-          >
-            B
-          </button>
-          <button
-            className={
-              editor?.isActive("italic")
-                ? styles.toolbarButtonActive
-                : styles.toolbarButton
-            }
-            onClick={toggleItalic}
-          >
-            I
-          </button>
-        </div>
-        <EditorContent editor={editor} className={styles.textEditorContent} />
-      </main>
+      {!!activeNote ? (
+        <NoteEditor
+          note={activeNote}
+          onChange={(content, title) =>
+            handleChangeNoteContent(activeNote.id, content, title)
+          }
+        />
+      ) : (
+        <div>Create a new note or select an existing one.</div>
+      )}
     </div>
   );
 }
