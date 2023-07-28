@@ -5,7 +5,7 @@ import { Note } from "./types";
 
 import styles from "./App.module.css";
 import { NoteEditor } from "./components/NoteEditor"
-import { loadNotes, saveNote } from "./utils/notes";
+import { loadNotes, saveNote } from "./utils";
 
 function App() {
   const [notes, setNotes] = useState<Record<string, Note>>(() => loadNotes());
