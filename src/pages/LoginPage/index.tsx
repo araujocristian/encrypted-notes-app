@@ -1,16 +1,15 @@
 import { ChangeEvent, FormEvent, useState } from "react";
+import CryptoJS from "crypto-js";
 import { v4 as uuid } from "uuid";
-// import AES from "crypto-js/aes";
-// import encUtf8 from "crypto-js/enc-utf8";
-import CryptoJS from 'crypto-js'
 import storage from "../../storage";
+import { UserData } from "../../types";
 
 import styles from "./styles.module.css";
 
 const PASSPHRASE_STORAGE_KEY = "passphrase";
 
 type LoginPageProps = {
-  setUserData: (userData: { username: string; passphrase: string }) => void;
+  setUserData: (userData: UserData) => void;
 };
 
 export function LoginPage({ setUserData }: LoginPageProps) {
@@ -36,9 +35,10 @@ export function LoginPage({ setUserData }: LoginPageProps) {
       return;
     }
 
-    const passphrase = CryptoJS.AES.decrypt(encryptedPassphrase, password).toString(
-      CryptoJS.enc.Utf8,
-    );
+    const passphrase = CryptoJS.AES.decrypt(
+      encryptedPassphrase,
+      password,
+    ).toString(CryptoJS.enc.Utf8);
 
     if (passphrase) {
       setUserData({ username, passphrase });

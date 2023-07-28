@@ -3,12 +3,18 @@ import { JSONContent } from "@tiptap/react";
 import { v4 as uuid } from "uuid";
 import { NoteEditor } from "../../components/NoteEditor";
 import { loadNotes, saveNote } from "../../utils";
-import { Note } from "../../types";
+import { Note, UserData } from "../../types";
 
 import styles from "./styles.module.css";
 
-export function NotesPage() {
-  const [notes, setNotes] = useState<Record<string, Note>>(() => loadNotes());
+type NotesPageProps = {
+  userData: UserData;
+};
+
+export function NotesPage({ userData }: NotesPageProps) {
+  const [notes, setNotes] = useState<Record<string, Note>>(() =>
+    loadNotes(userData),
+  );
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
 
   const activeNote = activeNoteId ? notes[activeNoteId] : null;
@@ -30,7 +36,7 @@ export function NotesPage() {
       [noteId]: updatedNote,
     }));
 
-    saveNote(updatedNote);
+    saveNote(updatedNote, userData);
   };
 
   const handleCreateNewNote = () => {
@@ -47,7 +53,7 @@ export function NotesPage() {
     }));
 
     setActiveNoteId(newNote.id);
-    saveNote(newNote);
+    saveNote(newNote, userData);
   };
 
   const handleChangeActiveNote = (id: string) => {
