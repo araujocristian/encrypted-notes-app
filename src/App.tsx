@@ -18,15 +18,19 @@ function App() {
     content: JSONContent,
     title = "New note",
   ) => {
+    const updatedNote = {
+      ...notes[noteId],
+      updatedAt: new Date(),
+      content,
+      title,
+    }
+
     setNotes((notes) => ({
       ...notes,
-      [noteId]: {
-        ...notes[noteId],
-        updatedAt: new Date(),
-        content,
-        title,
-      },
+      [noteId]: updatedNote,
     }));
+
+    saveNote(updatedNote)
   };
 
   const handleCreateNewNote = () => {
