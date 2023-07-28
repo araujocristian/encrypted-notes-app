@@ -1,5 +1,5 @@
 import { EditorContent, JSONContent, generateText, useEditor } from "@tiptap/react";
-import { Note } from "../types";
+import { Note } from "../../types";
 import StarterKit from "@tiptap/starter-kit";
 
 import styles from "./styles.module.css";

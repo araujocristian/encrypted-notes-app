@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { useEditor, EditorContent, JSONContent } from "@tiptap/react";
-import StarterKit from "@tiptap/starter-kit";
+import { JSONContent } from "@tiptap/react";
 import { v4 as uuid } from "uuid";
 import { Note } from "./types";
 
 import styles from "./App.module.css";
-import { NoteEditor } from "./NoteEditor";
+import { NoteEditor } from "./components/NoteEditor"
+import { loadNotes, saveNote } from "./utils/notes";
 
 function App() {
-  const [notes, setNotes] = useState<Record<string, Note>>({});
+  const [notes, setNotes] = useState<Record<string, Note>>(() => loadNotes());
   const [activeNoteId, setActiveNoteId] = useState<string | null>(null);
 
   const activeNote = activeNoteId ? notes[activeNoteId] : null;
@@ -43,6 +43,7 @@ function App() {
     }));
 
     setActiveNoteId(newNote.id)
+    saveNote(newNote)
   };
 
   const handleChangeActiveNote = (id: string) => {
